@@ -1,16 +1,19 @@
 const express = require("express");
 const config = require("config");
-const { errorHandler } = require("./helpers/error_handler");
 const mongoose = require("mongoose");
-const mainRouter = require("./routes/index.routes");
+const routes = require("./routes/index.routes");
+const errorHandler = require("./middleware/error_handling_middleware");
+const cookieParser = require("cookie-parser");
 
 const port = config.get("port");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(routes);
 
-app.use(mainRouter);
+app.use(errorHandler);
 
 async function start() {
     try {

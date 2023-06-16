@@ -8,6 +8,7 @@ const {
     getAuthorById,
     getAuthorByName,
     loginAuthor,
+    logoutAuthor,
 } = require("../controllers/author.controller");
 const authorPolice = require("../middleware/authorPolice");
 const authorRolesPolice = require("../middleware/authorRolesPolice");
@@ -22,6 +23,8 @@ router.get(
 router.get("/author/:author_first_name", getAuthorByName);
 router.delete("/:id", deleteAuthor);
 router.post("/login", loginAuthor);
+router.post("/logout", logoutAuthor);
+
 // router.put("/:id", updateAuthor);
 
 module.exports = router;

@@ -5,14 +5,16 @@ const { authorValidation } = require("../validations/author.validation");
 const bcrypt = require("bcrypt");
 const config = require("config");
 
-const generateAccessToken = (id, is_expert, authorRoles) => {
-    const payload = {
-        id,
-        is_expert,
-        authorRoles,
-    };
-    return jwt.sign(payload, config.get("secret"), { expiresIn: "1h" });
-};
+const myJwt = require("../services/JwtService");
+
+// const generateAccessToken = (id, is_expert, authorRoles) => {
+//     const payload = {
+//         id,
+//         is_expert,
+//         authorRoles,
+//     };
+//     return jwt.sign(payload, config.get("secret"), { expiresIn: "1h" });
+// };
 
 const addAuthor = async (req, res) => {
     try {
@@ -95,16 +97,43 @@ const loginAuthor = async (req, res) => {
                 .status(400)
                 .send({ message: "Email or password is incorrect" });
         }
+        const payload = {
+            id: author._id,
+            is_expert: author.is_expert,
+            authorRoles: ["READ", "WRITE"],
+        };
 
-        const token = generateAccessToken(author._id, author.is_expert, [
-            "READ",
-            "WRITE",
-        ]);
+        const tokens = myJwt.genereateTokens(payload);
+        // console.log(tokens);
 
-        res.status(200).send({ token: token });
+        author.author_token = tokens.refreshToken;
+        await author.save();
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            maxAge: config.get("refresh_ms"),
+            httpOnly: true,
+        });
+
+        res.status(200).send({ ...tokens });
     } catch (error) {
         errorHandler(res, error);
     }
+};
+
+const logoutAuthor = async (req, res) => {
+    const { refreshToken } = req.cookies;
+    let author;
+    if (!refreshToken) {
+        return res.status(400).send({ message: "Token topilmadi" });
+    }
+    author = await Author.findOneAndUpdate(
+        { author_token: refreshToken },
+        { author_token: "" },
+        { new: true }
+    );
+    if (!author) return res.status(400).send({ message: "Token topilmadi" });
+    res.clearCookie("refreshToken");
+    res.status(200).send({ author });
 };
 
 const getAllAuthors = async (req, res) => {
@@ -200,6 +229,7 @@ module.exports = {
     loginAuthor,
     deleteAuthor,
     // updateAuthor,
+    logoutAuthor,
     getAuthorById,
     getAuthorByName,
 };

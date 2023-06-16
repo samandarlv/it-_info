@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const config = require("config");
+const myJwt = require("../services/JwtService");
 
-module.exports = function (req, res, next) {
+module.exports = async function (req, res, next) {
     if (req.method == "OPTIONS") {
         next();
     }
@@ -22,9 +22,10 @@ module.exports = function (req, res, next) {
             });
         }
 
-        const decodedToken = jwt.verify(token, config.get("secret"));
-        // console.log(decodedToken);
-
+        const [error, decodedToken] = await to(myJwt.verifyAccess(token));
+        if (error) {
+            return res.status(403).json({ error_message: error.message });
+        }
         next();
     } catch (error) {
         console.log(error);
@@ -33,3 +34,9 @@ module.exports = function (req, res, next) {
             .send({ message: "Author is not registered, (token noto'g'ri) " });
     }
 };
+
+async function to(promise) {
+    return promise
+        .then((response) => [null, response])
+        .catch((error) => [error]);
+}
