@@ -22,6 +22,9 @@ const adminSchema = new Schema(
         admin_is_active: {
             type: Boolean,
         },
+        admin_token: {
+            type: String,
+        },
     },
     {
         versionKey: false,

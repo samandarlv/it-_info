@@ -106,10 +106,42 @@ exports.loginUser = async (req, res) => {
                 .status(400)
                 .send({ message: "Email or password is incorrect" });
         }
+
+        const payload = {
+            id: user._id,
+            is_active: user.user_is_active,
+        };
+
+        const tokens = myJwt.genereateTokens(payload);
+
+        user.user_token = tokens.refreshToken;
+        await user.save();
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            maxAge: config.get("refresh_ms"),
+            httpOnly: true,
+        });
+
         res.status(200).send({ message: "Welcome to system" });
     } catch (error) {
         errorHandler(res, error);
     }
+};
+
+exports.logoutUser = async (req, res) => {
+    const { refreshToken } = req.cookies;
+    let user;
+    if (!refreshToken) {
+        return res.status(400).send({ message: "Token topilmadi" });
+    }
+    user = await User.findOneAndUpdate(
+        { user_token: refreshToken },
+        { user_token: "" },
+        { new: true }
+    );
+    if (!user) return res.status(400).send({ message: "Token topilmadi" });
+    res.clearCookie("refreshToken");
+    res.status(200).send({ user });
 };
 
 exports.deleteUser = async (req, res) => {

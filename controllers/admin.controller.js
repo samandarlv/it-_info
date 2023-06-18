@@ -4,15 +4,16 @@ const { adminValidation } = require("../validations/admin.validation");
 const Admin = require("../models/admin");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const myJwt = require("../services/JwtService");
 
-const generateAccessToken = (id, is_active, is_creator) => {
-    const payload = {
-        id,
-        is_active,
-        is_creator,
-    };
-    return jwt.sign(payload, config.get("secret"), { expiresIn: "1h" });
-};
+// const generateAccessToken = (id, is_active, is_creator) => {
+//     const payload = {
+//         id,
+//         is_active,
+//         is_creator,
+//     };
+//     return jwt.sign(payload, config.get("secret"), { expiresIn: "1h" });
+// };
 
 exports.addAdmin = async (req, res) => {
     try {
@@ -112,16 +113,48 @@ exports.loginAdmin = async (req, res) => {
                 .status(400)
                 .send({ message: "Email or password is incorrect" });
         }
-        const token = generateAccessToken(
-            admin._id,
-            admin.admin_is_active,
-            admin.admin_is_creator
-        );
+        // const token = generateAccessToken(
+        //     admin._id,
+        //     admin.admin_is_active,
+        //     admin.admin_is_creator
+        // );
+
+        const payload = {
+            id: admin._id,
+            is_active: admin.admin_is_active,
+            is_creator: admin.admin_is_creator,
+        };
+
+        const tokens = myJwt.genereateTokens(payload);
+
+        admin.admin_token = tokens.refreshToken;
+        await admin.save();
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            maxAge: config.get("refresh_ms"),
+            httpOnly: true,
+        });
 
         res.status(200).send({ token: token });
     } catch (error) {
         errorHandler(res, error);
     }
+};
+
+exports.logoutAdmin = async (req, res) => {
+    const { refreshToken } = req.cookies;
+    let admin;
+    if (!refreshToken) {
+        return res.status(400).send({ message: "Token topilmadi" });
+    }
+    admin = await Admin.findOneAndUpdate(
+        { admin_token: refreshToken },
+        { admin_token: "" },
+        { new: true }
+    );
+    if (!admin) return res.status(400).send({ message: "Token topilmadi" });
+    res.clearCookie("refreshToken");
+    res.status(200).send({ admin });
 };
 
 exports.deleteAdmin = async (req, res) => {
