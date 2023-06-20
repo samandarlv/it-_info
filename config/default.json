@@ -1,11 +1,16 @@
 {
     "port": 3000,
-    "dbUri": "mongodb://localhost:27017/it_info",
+    "dbUri": "mongodb://127.0.0.1:27017/it_info",
     "atlasUri": "mongodb+srv://admin:admin@cluster0.ujgivrh.mongodb.net/it_info",
     "secret": "MyVeryVerySecretkey",
     "access_key": "BuAccessuchunMahfiyKalit",
     "refresh_key": "BuRefreshuchunMahfiyKalit",
-    "access_time": "20s",
+    "access_time": "20m",
     "refresh_time": "30d",
-    "refresh_ms": 2592000000
+    "refresh_ms": 2592000000,
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 587,
+    "smtp_user": "tajibayev.26@gmail.com",
+    "smtp_password": "uolymtvotjoxceva",
+    "api_Url": "http://localhost:3000"
 }

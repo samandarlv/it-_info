@@ -25,6 +25,13 @@ const userSchema = new Schema(
         },
         user_is_active: {
             type: Boolean,
+            default: false,
+        },
+        user_token: {
+            type: String,
+        },
+        user_activation_link: {
+            type: String,
         },
     },
     {

@@ -4,6 +4,9 @@ const { userValidation } = require("../validations/user.validations");
 const User = require("../models/user");
 const myJwt = require("../services/JwtService");
 const config = require("config");
+const uuid = require("uuid");
+const nodemailer = require("nodemailer");
+const mailService = require("../services/MailService");
 
 exports.addUser = async (req, res) => {
     try {
@@ -11,30 +14,70 @@ exports.addUser = async (req, res) => {
         // if (error) {
         //     return res.status(400).send({ message: error.details[0].message });
         // }
-        const {
-            user_name,
-            user_email,
-            user_password,
-            user_info,
-            user_photo,
-            user_is_active,
-        } = req.body;
+        const { user_name, user_email, user_password, user_info } = req.body;
         const user = await User.findOne({ user_email });
         if (user) {
             return res.status(400).send({ message: "User exists" });
         }
 
         const hashedPassword = await bcrypt.hash(user_password, 8);
+
+        const user_activation_link = uuid.v4();
+
         const newUser = await User({
             user_name,
             user_email,
             user_password: hashedPassword,
             user_info,
-            user_photo,
-            user_is_active,
+            user_activation_link,
         });
         await newUser.save();
-        res.status(200).send({ message: "User added" });
+
+        await mailService.sendActivationMail(
+            user_email,
+            `${config.get(
+                "api_Url"
+            )}/api/user/activate/${user_activation_link} `
+        );
+
+        const payload = {
+            id: newUser._id,
+            is_active: newUser.user_activation_link,
+            userRoles: ["READ"],
+        };
+
+        const tokens = myJwt.genereateTokens(payload);
+        newUser.user_token = tokens.refreshToken;
+        await newUser.save();
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            maxAge: config.get("refresh_ms"),
+            httpOnly: true,
+        });
+
+        res.status(200).send({ ...tokens, message: "User added" });
+    } catch (error) {
+        errorHandler(res, error);
+    }
+};
+
+exports.userActivation = async (req, res) => {
+    try {
+        const user = await User.findOne({
+            user_activation_link: req.params.link,
+        });
+        if (!user) {
+            return res.status(400).send({ message: "Bunday User topilmadi" });
+        }
+        if (user.user_is_active) {
+            return res.status(200).send({ message: "User alread activated" });
+        }
+        user.user_is_active = true;
+        await user.save();
+        res.status(200).send({
+            author_is_active: author.author_is_active,
+            message: "User activated",
+        });
     } catch (error) {
         errorHandler(res, error);
     }

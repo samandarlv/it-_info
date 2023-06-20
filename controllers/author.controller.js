@@ -1,9 +1,11 @@
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const { errorHandler } = require("../helpers/error_handler");
 const Author = require("../models/author");
-const { authorValidation } = require("../validations/author.validation");
+// const { authorValidation } = require("../validations/author.validation");
 const bcrypt = require("bcrypt");
 const config = require("config");
+const uuid = require("uuid");
+const mailService = require("../services/MailService");
 
 const myJwt = require("../services/JwtService");
 
@@ -17,55 +19,95 @@ const myJwt = require("../services/JwtService");
 // };
 
 const addAuthor = async (req, res) => {
+    // try {
+    // const { error, value } = authorValidation(req.body);
+    // if (error) {
+    //     return res.status(400).send({ message: error.details[0].message });
+    // }
+
+    const {
+        author_first_name,
+        author_last_name,
+        author_nick_name,
+        author_full_name,
+        author_password,
+        author_email,
+        author_phone,
+        author_info,
+        author_position,
+        author_photo,
+        is_expert,
+    } = req.body;
+
+    const author = await Author.findOne({ author_email });
+    if (author) {
+        return res.status(400).send({ message: "Author exists" });
+    }
+    // const hashedPassword = bcrypt.hashSync(author_password, 7);
+
+    const hashedPassword = await bcrypt.hash(author_password, 7);
+
+    const author_activation_link = uuid.v4();
+
+    const newAuthor = await Author({
+        author_first_name,
+        author_last_name,
+        author_nick_name,
+        author_full_name,
+        author_password: hashedPassword,
+        author_email,
+        author_phone,
+        author_info,
+        author_position,
+        author_photo,
+        is_expert,
+        author_activation_link,
+    });
+    await newAuthor.save();
+
+    await mailService.sendActivationMail(
+        author_email,
+        `${config.get("api_Url")}/api/author/activate/${author_activation_link}`
+    );
+
+    const payload = {
+        id: newAuthor._id,
+        is_expert: newAuthor.is_expert,
+        authorRoles: ["READ", "WRITE"],
+        user_is_active: newAuthor.autorhor_is_active,
+    };
+    const tokens = myJwt.genereateTokens(payload);
+    newAuthor.author_token = tokens.refreshToken;
+    await newAuthor.save();
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+        maxAge: config.get("refresh_ms"),
+        httpOnly: true,
+    });
+
+    res.status(200).send({ ...tokens, author: payload });
+    // } catch (error) {
+    // errorHandler(res, error);
+    // }
+};
+
+const authorActivate = async (req, res) => {
     try {
-        // const { error, value } = authorValidation(req.body);
-        // if (error) {
-        //     return res.status(400).send({ message: error.details[0].message });
-        // }
-
-        const {
-            author_first_name,
-            author_last_name,
-            author_nick_name,
-            author_full_name,
-            author_password,
-            confirm_password,
-            author_email,
-            author_phone,
-            author_info,
-            author_position,
-            author_photo,
-            is_expert,
-            birth_date,
-            birth_year,
-        } = req.body;
-
-        const author = await Author.findOne({ author_email });
-        if (author) {
-            return res.status(400).send({ message: "Author exists" });
-        } else {
-            // const hashedPassword = bcrypt.hashSync(author_password, 7);
-
-            const hashedPassword = await bcrypt.hash(author_password, 7);
-
-            const newAuthor = await Author({
-                author_first_name,
-                author_last_name,
-                author_nick_name,
-                author_full_name,
-                author_password: hashedPassword,
-                author_email,
-                author_phone,
-                author_info,
-                author_position,
-                author_photo,
-                is_expert,
-                birth_date,
-                birth_year,
-            });
-            await newAuthor.save();
+        const author = await Author.findOne({
+            author_activation_link: req.params.link,
+        });
+        if (!author) {
+            return res.status(400).send({ message: "Bunday Avtor topilmadi" });
         }
-        res.status(200).send({ message: "Author added" });
+        if (author.author_is_active) {
+            return res.status(200).send({ message: "User already activated" });
+        }
+        author.author_is_active = true;
+        await author.save();
+        res.status(200).send({
+            author_is_active: author.author_is_active,
+            message: "User activated",
+        });
     } catch (error) {
         errorHandler(res, error);
     }
@@ -273,4 +315,5 @@ module.exports = {
     getAuthorById,
     getAuthorByName,
     refreshAuthorToken,
+    authorActivate,
 };
