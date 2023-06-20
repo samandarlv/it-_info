@@ -18,10 +18,10 @@ const myJwt = require("../services/JwtService");
 
 const addAuthor = async (req, res) => {
     try {
-        const { error, value } = authorValidation(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = authorValidation(req.body);
+        // if (error) {
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
 
         const {
             author_first_name,
@@ -38,7 +38,7 @@ const addAuthor = async (req, res) => {
             is_expert,
             birth_date,
             birth_year,
-        } = value;
+        } = req.body;
 
         const author = await Author.findOne({ author_email });
         if (author) {
@@ -97,6 +97,7 @@ const loginAuthor = async (req, res) => {
                 .status(400)
                 .send({ message: "Email or password is incorrect" });
         }
+
         const payload = {
             id: author._id,
             is_expert: author.is_expert,
@@ -136,6 +137,44 @@ const logoutAuthor = async (req, res) => {
     res.status(200).send({ author });
 };
 
+const refreshAuthorToken = async (req, res) => {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+        return res.status(400).send({ message: "Token is not found" });
+    }
+
+    const authorDataFromCookie = await myJwt.verifyRefresh(refreshToken);
+    const authorDataFromDb = await Author.findOne({
+        author_token: refreshToken,
+    });
+
+    if (!authorDataFromCookie || !authorDataFromDb) {
+        return res.status(400).send({ message: "Author is not registred" });
+    }
+
+    const author = await Author.findById(authorDataFromDb.id);
+    if (!author) {
+        return res.status(400).send({ message: "Author not found such id" });
+    }
+
+    const payload = {
+        id: author._id,
+        is_expert: author.is_expert,
+        authorRoles: ["READ", "WRITE"],
+    };
+
+    const tokens = myJwt.genereateTokens(payload);
+    author.author_token = tokens.refreshToken;
+    await author.save();
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+        maxAge: config.get("refresh_ms"),
+        httpOnly: true,
+    });
+
+    res.status(200).send({ ...tokens });
+};
+
 const getAllAuthors = async (req, res) => {
     try {
         const authors = await Author.find({});
@@ -164,34 +203,35 @@ const deleteAuthor = async (req, res) => {
     }
 };
 
-// const updateAuthor = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         if (!mongoose.Types.ObjectId.isValid(id)) {
-//             return res.status(400).json({ message: "Invalid id" });
-//         }
-//         const author = await Author.findOne({ _id: req.params.id });
-//         if (!author) {
-//             return res.status(400).send({ message: "Author not found" });
-//         }
-//         const { author_name, parent_author_id } = req.body;
+const updateAuthor = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid id" });
+        }
+        const author = await Author.findOne({ _id: req.params.id });
+        if (!author) {
+            return res.status(400).send({ message: "Author not found" });
+        }
 
-//         if (parent_author_id) {
-//             const updated = await Author.updateOne(
-//                 { _id: req.params.id },
-//                 { $set: { author_name, parent_author_id } }
-//             );
-//         } else {
-//             const updated = await Author.updateOne(
-//                 { _id: req.params.id },
-//                 { $set: { author_name } }
-//             );
-//         }
-//         res.status(200).send({ message: "Author updated" });
-//     } catch (error) {
-//         errorHandler(res, error);
-//     }
-// };
+        const { author_name, parent_author_id } = req.body;
+
+        if (parent_author_id) {
+            const updated = await Author.updateOne(
+                { _id: req.params.id },
+                { $set: { author_name, parent_author_id } }
+            );
+        } else {
+            const updated = await Author.updateOne(
+                { _id: req.params.id },
+                { $set: { author_name } }
+            );
+        }
+        res.status(200).send({ message: "Author updated" });
+    } catch (error) {
+        errorHandler(res, error);
+    }
+};
 
 const getAuthorById = async (req, res) => {
     try {
@@ -228,8 +268,9 @@ module.exports = {
     getAllAuthors,
     loginAuthor,
     deleteAuthor,
-    // updateAuthor,
+    updateAuthor,
     logoutAuthor,
     getAuthorById,
     getAuthorByName,
+    refreshAuthorToken,
 };

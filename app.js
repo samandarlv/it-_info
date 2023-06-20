@@ -17,7 +17,7 @@ app.use(errorHandler);
 
 async function start() {
     try {
-        await mongoose.connect(config.get("dbUri"));
+        await mongoose.connect(config.get("atlasUri"));
         app.listen(port, () => {
             console.log(`Server ${port}-portda ishga tushdi`);
         });

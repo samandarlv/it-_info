@@ -1,4 +1,6 @@
 const { Router } = require("express");
+const Validator = require("../middleware/validator");
+
 const {
     addUser,
     getAllUsers,
@@ -8,10 +10,10 @@ const {
 } = require("../controllers/user.controller");
 const router = Router();
 
-router.post("/", addUser);
+router.post("/", Validator("user"), addUser);
 router.get("/", getAllUsers);
-router.put("/:id", updateUser);
-router.post("/login", loginUser);
+router.put("/:id", Validator("user"), updateUser);
+router.post("/login", Validator("user_email_pass"), loginUser);
 router.delete("/:id", deleteUser);
 
 module.exports = router;

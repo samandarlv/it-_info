@@ -1,19 +1,23 @@
 const { Router } = require("express");
 const router = Router();
+
 const {
     addAuthor,
     getAllAuthors,
     deleteAuthor,
-    // updateAuthor,
+    updateAuthor,
     getAuthorById,
     getAuthorByName,
     loginAuthor,
     logoutAuthor,
+    refreshAuthorToken,
 } = require("../controllers/author.controller");
+const Validator = require("../middleware/validator");
+
 const authorPolice = require("../middleware/authorPolice");
 const authorRolesPolice = require("../middleware/authorRolesPolice");
 
-router.post("/", addAuthor);
+router.post("/", Validator("author"), addAuthor);
 router.get("/", authorPolice, getAllAuthors);
 router.get(
     "/:id",
@@ -22,9 +26,9 @@ router.get(
 );
 router.get("/author/:author_first_name", getAuthorByName);
 router.delete("/:id", deleteAuthor);
-router.post("/login", loginAuthor);
+router.post("/login", Validator("author_email_pass"), loginAuthor);
 router.post("/logout", logoutAuthor);
-
-// router.put("/:id", updateAuthor);
+router.put("/:id", Validator("author"), updateAuthor);
+router.post("/refresh", refreshAuthorToken);
 
 module.exports = router;

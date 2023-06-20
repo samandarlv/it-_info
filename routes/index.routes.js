@@ -1,22 +1,28 @@
 const { Router } = require("express");
+const express = require("express");
 const router = Router();
 
-const dictionaryRouter = require("./dictionary.routes");
-router.use("/api/term", dictionaryRouter);
-
-const categoryRouter = require("./category.routes");
-router.use("/api/category", categoryRouter);
-
 const descRouter = require("./description.routes");
-router.use("/api/description", descRouter);
-
-const authorRouter = require("./author.routes");
-router.use("/api/author", authorRouter);
-
+const categoryRouter = require("./category.routes");
 const adminRouter = require("./admin.routes");
-router.use("/api/admin", adminRouter);
-
+const authorRouter = require("./author.routes");
 const userRouter = require("./user.routes");
-router.use("/api/user", userRouter);
+const dictionaryRouter = require("./dictionary.routes");
+
+express.Router.prefix = function (path, subRouter) {
+    const router = express.Router();
+    this.use(path, router);
+    subRouter(router);
+    return router;
+};
+
+router.prefix("/api", (apiRouter) => {
+    apiRouter.use("/category", categoryRouter);
+    apiRouter.use("/term", dictionaryRouter);
+    apiRouter.use("/description", descRouter);
+    apiRouter.use("/author", authorRouter);
+    apiRouter.use("/admin", adminRouter);
+    apiRouter.use("/user", userRouter);
+});
 
 module.exports = router;

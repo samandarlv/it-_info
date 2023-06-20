@@ -2,13 +2,15 @@ const bcrypt = require("bcrypt");
 const { errorHandler } = require("../helpers/error_handler");
 const { userValidation } = require("../validations/user.validations");
 const User = require("../models/user");
+const myJwt = require("../services/JwtService");
+const config = require("config");
 
 exports.addUser = async (req, res) => {
     try {
-        const { error, value } = userValidation(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = userValidation(req.body);
+        // if (error) {
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
         const {
             user_name,
             user_email,
@@ -16,7 +18,7 @@ exports.addUser = async (req, res) => {
             user_info,
             user_photo,
             user_is_active,
-        } = value;
+        } = req.body;
         const user = await User.findOne({ user_email });
         if (user) {
             return res.status(400).send({ message: "User exists" });
@@ -52,10 +54,10 @@ exports.getAllUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
-        const { error, value } = userValidation(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = userValidation(req.body);
+        // if (error) {
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
         const {
             user_name,
             user_email,
@@ -63,7 +65,7 @@ exports.updateUser = async (req, res) => {
             user_info,
             user_photo,
             user_is_active,
-        } = value;
+        } = req.body;
         const hashedPassword = await bcrypt.hash(user_password, 8);
         const updatedUser = await User.updateOne(
             { _id: req.params.id },

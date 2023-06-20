@@ -5,13 +5,13 @@ const { categoryValidation } = require("../validations/category");
 
 const addCategory = async (req, res) => {
     try {
-        const { error, value } = categoryValidation(req.body);
-        if (error) {
-            // console.log(value);
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = categoryValidation(req.body);
+        // if (error) {
+        //     // console.log(value);
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
 
-        const { category_name, parent_category_id } = value;
+        const { category_name, parent_category_id } = req.body;
 
         const category = await Category.findOne({
             category_name: { $regex: category_name, $options: "i" },
@@ -71,10 +71,12 @@ const updateCategory = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid id" });
         }
+
         const category = await Category.findOne({ _id: req.params.id });
         if (!category) {
             return res.status(400).send({ message: "Category not found" });
         }
+
         const { category_name, parent_category_id } = req.body;
 
         if (parent_category_id) {

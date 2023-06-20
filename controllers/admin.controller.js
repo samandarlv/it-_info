@@ -17,17 +17,18 @@ const myJwt = require("../services/JwtService");
 
 exports.addAdmin = async (req, res) => {
     try {
-        const { error, value } = adminValidation(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = adminValidation(req.body);
+        // if (error) {
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
         const {
             admin_name,
             admin_email,
             admin_password,
             admin_is_active,
             admin_is_creator,
-        } = value;
+        } = req.body;
+
         const admin = await Admin.findOne({ admin_email });
         if (admin) {
             return res.status(400).send({ message: "Admin exists" });
@@ -61,17 +62,17 @@ exports.getAllAdmins = async (req, res) => {
 
 exports.updateAdmin = async (req, res) => {
     try {
-        const { error, value } = adminValidation(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        // const { error, value } = adminValidation(req.body);
+        // if (error) {
+        //     return res.status(400).send({ message: error.details[0].message });
+        // }
         const {
             admin_name,
             admin_email,
             admin_password,
             admin_is_active,
             admin_is_creator,
-        } = value;
+        } = req.body;
         const hashedPassword = await bcrypt.hash(admin_password, 8);
         const updatedAdmin = await Admin.updateOne(
             { _id: req.params.id },
@@ -155,6 +156,10 @@ exports.logoutAdmin = async (req, res) => {
     if (!admin) return res.status(400).send({ message: "Token topilmadi" });
     res.clearCookie("refreshToken");
     res.status(200).send({ admin });
+};
+
+exports.refreshAdminToken = async (req, res) => {
+    const { refreshToken } = req.cookies;
 };
 
 exports.deleteAdmin = async (req, res) => {
