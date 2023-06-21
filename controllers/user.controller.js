@@ -29,7 +29,6 @@ exports.addUser = async (req, res) => {
             user_email,
             user_password: hashedPassword,
             user_info,
-            user_activation_link,
         });
         await newUser.save();
 
@@ -64,7 +63,7 @@ exports.addUser = async (req, res) => {
 exports.userActivation = async (req, res) => {
     try {
         const user = await User.findOne({
-            user_activation_link: req.params.link,
+            user_activation_link: req.param.link,
         });
         if (!user) {
             return res.status(400).send({ message: "Bunday User topilmadi" });
@@ -74,10 +73,7 @@ exports.userActivation = async (req, res) => {
         }
         user.user_is_active = true;
         await user.save();
-        res.status(200).send({
-            author_is_active: author.author_is_active,
-            message: "User activated",
-        });
+        res.status(200).send({});
     } catch (error) {
         errorHandler(res, error);
     }

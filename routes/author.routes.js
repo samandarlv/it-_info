@@ -20,16 +20,12 @@ const authorRolesPolice = require("../middleware/authorRolesPolice");
 
 router.post("/", Validator("author"), addAuthor);
 router.get("/", authorPolice, getAllAuthors);
-router.get(
-    "/:id",
-    authorRolesPolice(["READ", "WRITE", "CHANGE", "DELETE"]),
-    getAuthorById
-);
+router.get("/:id", authorPolice, getAuthorById);
 router.get("/author/:author_first_name", getAuthorByName);
-router.delete("/:id", deleteAuthor);
+router.delete("/delete/:id", authorPolice, deleteAuthor);
 router.post("/login", Validator("author_email_pass"), loginAuthor);
 router.post("/logout", logoutAuthor);
-router.put("/:id", Validator("author"), updateAuthor);
+router.put("/:id", Validator("author"), authorPolice, updateAuthor);
 // router.post("/refresh", refreshAuthorToken);
 router.get("/activate/:link", authorActivate);
 

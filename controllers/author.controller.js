@@ -157,6 +157,18 @@ const loginAuthor = async (req, res) => {
             httpOnly: true,
         });
 
+        // //uncaughtException
+        // try {
+        //     setTimeout(() => {
+        //         var err = new Error("Hello");
+        //         throw err;
+        //     }, 1000);
+        // } catch (error) {
+        //     console.log(error);
+        // }
+        // //unhandledRejection
+        // new Promise((_, reject) => reject(new Error("woops1")));
+
         res.status(200).send({ ...tokens });
     } catch (error) {
         errorHandler(res, error);
@@ -231,11 +243,17 @@ const getAllAuthors = async (req, res) => {
 
 const deleteAuthor = async (req, res) => {
     try {
-        const author = await Author.findById(req.params.id);
-        if (!author) {
-            return res.status(400).send({ message: "Author not found" });
+        const id = req.params.id;
+        if (id != req.author.id) {
+            return res.status(401).send({ message: "Sizda bunday huquq yo'q" });
         }
-        const deleted = await Author.deleteOne({ _id: req.params.id });
+        const author = await Author.findById(id);
+        if (!author) {
+            return res
+                .status(400)
+                .send({ message: "Author not found such id" });
+        }
+        const deleted = await Author.deleteOne({ _id: id });
         if (!deleted.acknowledged) {
             return res.status(400).send({ message: "Author is not deleted" });
         }
@@ -248,12 +266,14 @@ const deleteAuthor = async (req, res) => {
 const updateAuthor = async (req, res) => {
     try {
         const { id } = req.params;
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Invalid id" });
+        if (id != req.author.id) {
+            return res.status(400).send({ message: "Sizda bunday huquq yo'q" });
         }
-        const author = await Author.findOne({ _id: req.params.id });
+        const author = await Author.findOne({ _id: id });
         if (!author) {
-            return res.status(400).send({ message: "Author not found" });
+            return res
+                .status(400)
+                .send({ message: "Author not found such id" });
         }
 
         const { author_name, parent_author_id } = req.body;
@@ -277,9 +297,16 @@ const updateAuthor = async (req, res) => {
 
 const getAuthorById = async (req, res) => {
     try {
-        const author = await Author.findOne({ _id: req.params.id });
+        const { id } = req.params;
+        if (id != req.author.id) {
+            return res.status(400).send({ message: "Sizda bunday huquq yo'q" });
+        }
+
+        const author = await Author.findOne({ _id: id });
         if (!author) {
-            return res.status(400).send({ message: "Author not found" });
+            return res
+                .status(400)
+                .send({ message: "Author not found such id" });
         }
         res.json(author);
     } catch (error) {
