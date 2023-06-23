@@ -1,0 +1,138 @@
+{
+    "level": "error",
+    "message": "middlewareError",
+    "meta": {
+        "date": "Thu Jun 22 2023 11:33:19 GMT+0500 (Uzbekistan Standard Time)",
+        "error": {
+            "body": "{\r\n    \"author_email\": \"salim1@gmail.com\"\r\n    \"author_password\": \"123456\" \r\n}",
+            "expose": true,
+            "status": 400,
+            "statusCode": 400,
+            "type": "entity.parse.failed"
+        },
+        "exception": true,
+        "level": "error",
+        "message": "uncaughtException: Unexpected string in JSON at position 47\nSyntaxError: Unexpected string in JSON at position 47\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\types\\json.js:89:19)\n    at C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:203:9)\n    at invokeCallback (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:231:16)\n    at done (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:220:7)\n    at IncomingMessage.onEnd (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:280:7)\n    at IncomingMessage.emit (node:events:513:28)\n    at endReadableNT (node:internal/streams/readable:1359:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)",
+        "os": { "loadavg": [0, 0, 0], "uptime": 481099.5 },
+        "process": {
+            "argv": [
+                "C:\\Program Files\\nodejs\\node.exe",
+                "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\app.js"
+            ],
+            "cwd": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info",
+            "execPath": "C:\\Program Files\\nodejs\\node.exe",
+            "gid": null,
+            "memoryUsage": {
+                "arrayBuffers": 36200355,
+                "external": 37166738,
+                "heapTotal": 35123200,
+                "heapUsed": 32491520,
+                "rss": 71471104
+            },
+            "pid": 7252,
+            "uid": null,
+            "version": "v18.16.0"
+        },
+        "req": {
+            "headers": {
+                "accept": "*/*",
+                "accept-encoding": "gzip, deflate, br",
+                "connection": "keep-alive",
+                "content-length": "78",
+                "content-type": "application/json",
+                "cookie": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OTI4YWZhYTNjYThkY2FlNzYzZWM2OCIsImlzX2V4cGVydCI6ZmFsc2UsImF1dGhvclJvbGVzIjpbIlJFQUQiLCJXUklURSJdLCJpYXQiOjE2ODc0MTQ2NjEsImV4cCI6MTY5MDAwNjY2MX0.-NVdbdSMevf5DVORNZxg7ZEzlD5uH9_-EmFv62w5luU",
+                "host": "localhost:3000",
+                "postman-token": "f0b39972-a143-425d-90e9-0fe5be646f40",
+                "user-agent": "PostmanRuntime/7.32.3"
+            },
+            "httpVersion": "1.1",
+            "method": "POST",
+            "originalUrl": "/api/author/login",
+            "query": {},
+            "url": "/api/author/login"
+        },
+        "stack": "SyntaxError: Unexpected string in JSON at position 47\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\types\\json.js:89:19)\n    at C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:203:9)\n    at invokeCallback (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:231:16)\n    at done (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:220:7)\n    at IncomingMessage.onEnd (C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js:280:7)\n    at IncomingMessage.emit (node:events:513:28)\n    at endReadableNT (node:internal/streams/readable:1359:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)",
+        "trace": [
+            {
+                "column": null,
+                "file": null,
+                "function": "JSON.parse",
+                "line": null,
+                "method": "parse",
+                "native": false
+            },
+            {
+                "column": 19,
+                "file": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\types\\json.js",
+                "function": "parse",
+                "line": 89,
+                "method": null,
+                "native": false
+            },
+            {
+                "column": 18,
+                "file": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\body-parser\\lib\\read.js",
+                "function": null,
+                "line": 128,
+                "method": null,
+                "native": false
+            },
+            {
+                "column": 9,
+                "file": "node:async_hooks",
+                "function": "AsyncResource.runInAsyncScope",
+                "line": 203,
+                "method": "runInAsyncScope",
+                "native": false
+            },
+            {
+                "column": 16,
+                "file": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js",
+                "function": "invokeCallback",
+                "line": 231,
+                "method": null,
+                "native": false
+            },
+            {
+                "column": 7,
+                "file": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js",
+                "function": "done",
+                "line": 220,
+                "method": null,
+                "native": false
+            },
+            {
+                "column": 7,
+                "file": "C:\\Users\\Samandar\\Desktop\\FullStack\\Lessons\\Mongo DB\\it info\\node_modules\\raw-body\\index.js",
+                "function": "IncomingMessage.onEnd",
+                "line": 280,
+                "method": "onEnd",
+                "native": false
+            },
+            {
+                "column": 28,
+                "file": "node:events",
+                "function": "IncomingMessage.emit",
+                "line": 513,
+                "method": "emit",
+                "native": false
+            },
+            {
+                "column": 12,
+                "file": "node:internal/streams/readable",
+                "function": "endReadableNT",
+                "line": 1359,
+                "method": null,
+                "native": false
+            },
+            {
+                "column": 21,
+                "file": "node:internal/process/task_queues",
+                "function": "process.processTicksAndRejections",
+                "line": 82,
+                "method": "processTicksAndRejections",
+                "native": false
+            }
+        ]
+    }
+}

@@ -157,7 +157,7 @@ const loginAuthor = async (req, res) => {
             httpOnly: true,
         });
 
-        // //uncaughtException
+        //uncaughtException
         // try {
         //     setTimeout(() => {
         //         var err = new Error("Hello");
