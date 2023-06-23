@@ -62,7 +62,7 @@ app.use(routes);
 //     console.log("unhandledRejection:", rej);
 // });
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 async function start() {
     try {

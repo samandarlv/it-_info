@@ -5,7 +5,7 @@
     "secret": "MyVeryVerySecretkey",
     "access_key": "BuAccessuchunMahfiyKalit",
     "refresh_key": "BuRefreshuchunMahfiyKalit",
-    "access_time": "20m",
+    "access_time": "30d",
     "refresh_time": "30d",
     "refresh_ms": 2592000000,
     "smtp_host": "smtp.gmail.com",

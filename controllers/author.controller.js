@@ -235,7 +235,7 @@ const getAllAuthors = async (req, res) => {
         if (authors.length < 1) {
             return res.status(400).send({ message: "Authors not found" });
         }
-        res.json(authors);
+        res.json({ data: authors });
     } catch (error) {
         errorHandler(res, error);
     }

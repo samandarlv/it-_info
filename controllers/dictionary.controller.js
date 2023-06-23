@@ -27,7 +27,7 @@ const getTerms = async (req, res) => {
         if (terms.length < 1) {
             return res.status(400).send({ message: "Terms not found" });
         }
-        res.json(terms);
+        res.json({ data: terms });
     } catch (error) {
         errorHandler(res, error);
     }
