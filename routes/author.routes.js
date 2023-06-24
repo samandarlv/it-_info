@@ -26,7 +26,7 @@ router.delete("/delete/:id", authorPolice, deleteAuthor);
 router.post("/login", Validator("author_email_pass"), loginAuthor);
 router.post("/logout", logoutAuthor);
 router.put("/:id", Validator("author"), authorPolice, updateAuthor);
-// router.post("/refresh", refreshAuthorToken);
+router.post("/refresh", refreshAuthorToken);
 router.get("/activate/:link", authorActivate);
 
 module.exports = router;
